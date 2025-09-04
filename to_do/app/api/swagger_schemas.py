@@ -1,0 +1,43 @@
+from drf_yasg import openapi
+from app.serializers import UserSerializer
+
+
+def login_schema():
+    return {
+        "method": "post",
+        "operation_description": "Login a user",
+        "request_body": openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=["username", "password"],
+            properties={
+                "username": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Username"
+                ),
+                "password": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Password"
+                ),
+            },
+        ),
+        "responses": {200: openapi.Response("Login successful", UserSerializer)},
+    }
+
+
+def register_schema():
+    return {
+        "method": "post",
+        "operation_description": "Register a new user",
+        "request_body": openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=["username", "email", "password"],
+            properties={
+                "username": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Username"
+                ),
+                "email": openapi.Schema(type=openapi.TYPE_STRING, description="Email"),
+                "password": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Password"
+                ),
+            },
+        ),
+        "responses": {200: openapi.Response("Registration successful", UserSerializer)},
+    }

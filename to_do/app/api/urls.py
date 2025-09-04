@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework import permissions
-from .views import login, register
+from app.api.views import login , register
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
