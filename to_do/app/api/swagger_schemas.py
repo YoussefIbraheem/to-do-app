@@ -41,3 +41,10 @@ def register_schema():
         ),
         "responses": {200: openapi.Response("Registration successful", UserSerializer)},
     }
+    
+
+def category_list_schema():
+    return {
+        "operation_description": "Retrieve all categories for the authenticated user",
+        "responses": {200: openapi.Response("List of categories")},
+    }
