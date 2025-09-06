@@ -11,7 +11,7 @@ class ToDoFactory:
             "description": kwargs.get("description", faker.paragraph(5)),
             "status": kwargs.get(
                 "status",
-                faker.random_choices([status.value for status in ToDo.StatusChoices]),
+                faker.random_element(elements=[choice[0] for choice in ToDo.StatusChoices.choices]),
             ),
         }
 

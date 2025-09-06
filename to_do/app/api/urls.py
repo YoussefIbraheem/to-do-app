@@ -1,21 +1,16 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter , SimpleRouter
 from rest_framework import permissions
-from app.api.views import login , register , ToDoViewSet , CategoryList 
+from app.api.views import login , register , ToDoList , CategoryList , ToDoDetails
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-simple_router = SimpleRouter()
 
-simple_router.register(r"todos", ToDoViewSet, basename="todo")
 
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Snippets API",
+        title="To-DO API",
         default_version="v1",
-        description="Test description",
-        terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="contact@snippets.local"),
         license=openapi.License(name="BSD License"),
     ),
@@ -36,5 +31,6 @@ urlpatterns = [
     path("login/", login, name="login"),
     path("register/", register, name="register"),
     path("categories/", CategoryList.as_view(), name="category-list"),
-    path("", include(simple_router.urls)),
+    path("todos/", ToDoList.as_view(), name="todo-list"),
+    path("todos/<int:pk>", ToDoDetails.as_view(), name="to-do-details")
 ]
