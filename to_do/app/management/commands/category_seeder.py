@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand , CommandError
 from app.models import Category
 from app.factories import CategoryFactory
-
+from app import file_logger
 
 class Command(BaseCommand):
     help = "Seed categories into the database"
@@ -14,3 +14,4 @@ class Command(BaseCommand):
             category = Category(**category_data)
             category.save()
         self.stdout.write(self.style.SUCCESS(f"Successfully seeded {count} categories"))
+        file_logger.info(f"seeded {count} categories")
