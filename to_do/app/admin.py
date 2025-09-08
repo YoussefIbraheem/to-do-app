@@ -15,5 +15,7 @@ class CategoryAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
 
+
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(ToDo, ToDoAdmin)
