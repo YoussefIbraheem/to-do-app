@@ -11,7 +11,8 @@ from rest_framework import permissions, decorators, viewsets, status
 from rest_framework.response import Response
 from app.utils import AuthUtils
 from drf_yasg.utils import swagger_auto_schema
-from .swagger_schemas import AuthSchema , CategorySchema , ToDoSchema
+from .swagger_schemas import AuthSchema, CategorySchema, ToDoSchema
+from django.views.decorators.cache import cache_page
 
 # Authentication
 
@@ -45,6 +46,7 @@ class CategoryList(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     @swagger_auto_schema(**CategorySchema.category_list_schema())
+    @method_decorator(cache_page(60 * 15, key_prefix="category_list"))
     def get(self, request, format=None):
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
@@ -56,9 +58,10 @@ class ToDoList(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(**ToDoSchema.todo_list_schema())
+    @method_decorator(cache_page(60 * 15, key_prefix="todo_list"))
     def get(self, request, format=None):
         todo = ToDo.objects.filter(user=request.user)
-        serializer = ToDoSerializer(todo,many=True)
+        serializer = ToDoSerializer(todo, many=True)
         return Response(serializer.data)
 
     @swagger_auto_schema(**ToDoSchema.create_todo_schema())
