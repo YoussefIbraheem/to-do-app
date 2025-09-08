@@ -14,4 +14,4 @@ class Command(BaseCommand):
             category = Category(**category_data)
             category.save()
         self.stdout.write(self.style.SUCCESS(f"Successfully seeded {count} categories"))
-        file_logger.info(f"seeded {count} categories")
+        
