@@ -94,9 +94,8 @@ class ToDoDetails(APIView):
     def get_object(self, request, pk):
         try:
             return ToDo.objects.filter(user=request.user).get(pk=pk)
-        except ToDo.DoesNotExist:
-            raise status.HTTP_404_NOT_FOUND
-
+        except ToDo.DoesNotExist as e:
+            raise Exception("ToDo not found") from e
     @swagger_auto_schema(**ToDoSchema.todo_details_schema())
     def get(self, request, pk, format=None):
         to_do = self.get_object(request, pk)

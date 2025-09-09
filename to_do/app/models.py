@@ -19,6 +19,8 @@ class ToDo(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(max_length=1000)
     status = models.CharField(choices=StatusChoices,default=StatusChoices.PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
     
     user = models.ForeignKey(User , on_delete=models.CASCADE)
     categories = models.ManyToManyField(Category)
