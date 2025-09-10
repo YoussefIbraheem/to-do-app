@@ -59,8 +59,11 @@ class ToDoList(APIView):
 
     @swagger_auto_schema(**ToDoSchema.todo_list_schema())
     @method_decorator(cache_page(60 * 15, key_prefix="todo_list"))
-    def get(self, request, format=None):
+    def get(self,request: dict, format=None):
         todo = ToDo.objects.filter(user=request.user)
+        if 'categories' in request.query_params:
+            categories = request.query_params.getlist('categories', [])
+            todo = todo.filter(categories__in=categories)
         serializer = ToDoSerializer(todo, many=True)
         return Response(serializer.data)
 

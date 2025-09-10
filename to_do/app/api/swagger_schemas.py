@@ -60,13 +60,16 @@ class ToDoSchema:
 
     def todo_list_schema():
         return {
-            "operation_description": "Retrieve all todo for the authenticated user",
+            "operation_description": "Retrieve all todos for the authenticated user",
             "manual_parameters": [
                 openapi.Parameter(
-                    name="category",
-                    in_=openapi.IN_QUERY,
-                    type=openapi.TYPE_INTEGER,
-                    description="Filter todos by category ID",
+                    name= "categories",
+                    in_= openapi.IN_QUERY,
+                    description="Filter todos by category IDs",
+                    type=openapi.TYPE_ARRAY,
+                    items= openapi.Items(type=openapi.TYPE_INTEGER),
+                    collectionFormat="multi",
+                    required=False,
                 )
             ],
             "responses": {200: openapi.Response("List of todos")},

@@ -18,7 +18,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class ToDoSerializer(serializers.ModelSerializer):
 
     user = serializers.StringRelatedField()
-    categories = serializers.StringRelatedField(many=True)
+    categories = CategorySerializer(many=True, read_only=True)
 
     class Meta:
         model = ToDo
