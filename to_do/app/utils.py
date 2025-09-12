@@ -1,7 +1,8 @@
 from django.contrib.auth import authenticate, login
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
-
+from .models import Category
+from .serializers import CategorySerializer
 class AuthUtils:
 
     def login(request):
@@ -23,3 +24,13 @@ class AuthUtils:
         user = User.objects.create_user(username=username, email=email, password=password)
         token, _ = Token.objects.get_or_create(user=user)
         return user, token 
+    
+
+class CategoryUtils:
+    
+    def get_categories():
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
+        return serializer
+        
+        

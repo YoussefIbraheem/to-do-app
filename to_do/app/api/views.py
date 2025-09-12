@@ -9,7 +9,7 @@ from app.models import ToDo, Category
 from rest_framework.views import APIView
 from rest_framework import permissions, decorators, viewsets, status
 from rest_framework.response import Response
-from app.utils import AuthUtils
+from app.utils import AuthUtils , CategoryUtils
 from drf_yasg.utils import swagger_auto_schema
 from .swagger_schemas import AuthSchema, CategorySchema, ToDoSchema
 from django.views.decorators.cache import cache_page
@@ -27,8 +27,8 @@ class AuthView:
             return Response({"user": UserSerializer(user).data, "token": token.key})
         else:
             return Response({"error": "Invalid Credentials"}, status=400)
-    
-    
+
+
     @swagger_auto_schema(**AuthSchema.register_schema())
     @decorators.api_view(["POST"])
     @decorators.permission_classes([permissions.AllowAny])
@@ -49,8 +49,7 @@ class CategoryList(APIView):
     @swagger_auto_schema(**CategorySchema.category_list_schema())
     @method_decorator(cache_page(60 * 15, key_prefix="category_list"))
     def get(self, request, format=None):
-        categories = Category.objects.all()
-        serializer = CategorySerializer(categories, many=True)
+        serializer = CategoryUtils.get_categories()
         return Response(serializer.data)
 
 
