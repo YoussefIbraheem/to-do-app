@@ -13,7 +13,7 @@ from app.utils import AuthUtils
 from drf_yasg.utils import swagger_auto_schema
 from .swagger_schemas import AuthSchema, CategorySchema, ToDoSchema
 from django.views.decorators.cache import cache_page
-
+from django.http import Http404
 # Authentication
 
 
@@ -59,12 +59,13 @@ class ToDoList(APIView):
 
     @swagger_auto_schema(**ToDoSchema.todo_list_schema())
     @method_decorator(cache_page(60 * 15, key_prefix="todo_list"))
-    def get(self,request: dict, format=None):
-        todo = ToDo.objects.filter(user=request.user)
-        if 'categories' in request.query_params:
-            categories = request.query_params.getlist('categories', [])
-            todo = todo.filter(categories__in=categories)
-        serializer = ToDoSerializer(todo, many=True)
+    def get(self, request, format=None):
+        query = ToDo.objects.filter(user=request.user)
+        if "categories" in request.query_params:
+            categories = request.query_params.getlist("categories", [])
+            query = query.filter(categories__in=categories)
+        todos = query.all()
+        serializer = ToDoSerializer(todos, many=True)
         return Response(serializer.data)
 
     @swagger_auto_schema(**ToDoSchema.create_todo_schema())
@@ -75,9 +76,26 @@ class ToDoList(APIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
+
+class ToDoDetails(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self, user, pk):
+        try:
+            return ToDo.objects.filter(user=user).get(pk=pk)
+        except ToDo.DoesNotExist:
+            raise Http404
+
+    @swagger_auto_schema(**ToDoSchema.todo_details_schema())
+    def get(self, request, pk, format=None):
+        print(request.user)
+        to_do = self.get_object(user=request.user, pk=pk)
+        serializer = ToDoSerializer(to_do)
+        return Response(serializer.data)
+
     @swagger_auto_schema(**ToDoSchema.update_todo_schema())
     def put(self, request, pk, format=None):
-        to_do = ToDo.get_object(pk)
+        to_do = self.get_object(user=request.user, pk=pk)
         serializer = CreateToDoSerializer(to_do, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -86,16 +104,6 @@ class ToDoList(APIView):
 
     @swagger_auto_schema(**ToDoSchema.delete_todo_schema())
     def delete(self, request, pk, format=None):
-        to_do = ToDo.get_object(pk)
+        to_do = self.get_object(user=request.user, pk=pk)
         to_do.delete()
         return Response(status=204)
-
-
-class ToDoDetails(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    @swagger_auto_schema(**ToDoSchema.todo_details_schema())
-    def get(self, request, pk, format=None):
-        to_do = ToDo.get_object(request, pk)
-        serializer = ToDoSerializer(to_do)
-        return Response(serializer.data)

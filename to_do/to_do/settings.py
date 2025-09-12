@@ -108,8 +108,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-if not os.path.exists(env('LOG_DIR')):
-    os.mkdir(env('LOG_DIR'))
+if not os.path.exists(env("LOG_DIR")):
+    os.mkdir(env("LOG_DIR"))
 
 
 LOGGING = {
@@ -148,7 +148,12 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-    ]
+    ],
+    "TEST_REQUEST_RENDERER_CLASSES": [
+        "rest_framework.renderers.MultiPartRenderer",
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.TemplateHTMLRenderer",
+    ],
 }
 
 
@@ -180,6 +185,6 @@ CACHES = {
         "LOCATION": f"redis://{env('REDIS_HOST')}:{env('REDIS_PORT')}/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
+        },
     }
 }

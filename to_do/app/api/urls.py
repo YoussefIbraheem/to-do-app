@@ -32,5 +32,5 @@ urlpatterns = [
     path("register/", register, name="register"),
     path("categories/", CategoryList.as_view(), name="category-list"),
     path("todos/", ToDoList.as_view(), name="todo-list"),
-    path("todos/<int:pk>", ToDoDetails.as_view(), name="to-do-details")
+    path("todos/<int:pk>", ToDoDetails.as_view(), name="todo-details")
 ]

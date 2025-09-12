@@ -22,4 +22,4 @@ class AuthUtils:
             return None, None
         user = User.objects.create_user(username=username, email=email, password=password)
         token, _ = Token.objects.get_or_create(user=user)
-        return user, token
+        return user, token 

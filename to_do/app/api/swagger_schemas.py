@@ -63,11 +63,11 @@ class ToDoSchema:
             "operation_description": "Retrieve all todos for the authenticated user",
             "manual_parameters": [
                 openapi.Parameter(
-                    name= "categories",
-                    in_= openapi.IN_QUERY,
+                    name="categories",
+                    in_=openapi.IN_QUERY,
                     description="Filter todos by category IDs",
                     type=openapi.TYPE_ARRAY,
-                    items= openapi.Items(type=openapi.TYPE_INTEGER),
+                    items=openapi.Items(type=openapi.TYPE_INTEGER),
                     collectionFormat="multi",
                     required=False,
                 )
