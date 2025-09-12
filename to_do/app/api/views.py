@@ -9,6 +9,7 @@ from app.models import ToDo, Category
 from rest_framework.views import APIView
 from rest_framework import permissions, decorators, viewsets, status
 from rest_framework.response import Response
+from rest_framework.exceptions import NotAuthenticated
 from app.utils import AuthUtils , CategoryUtils
 from drf_yasg.utils import swagger_auto_schema
 from .swagger_schemas import AuthSchema, CategorySchema, ToDoSchema
@@ -49,8 +50,11 @@ class CategoryList(APIView):
     @swagger_auto_schema(**CategorySchema.category_list_schema())
     @method_decorator(cache_page(60 * 15, key_prefix="category_list"))
     def get(self, request, format=None):
-        serializer = CategoryUtils.get_categories()
-        return Response(serializer.data)
+        try:
+            serializer = CategoryUtils.get_categories()
+            return Response(serializer.data)
+        except NotAuthenticated as e :
+            raise Response(e.detail,status=status.HTTP_403_FORBIDDEN)
 
 
 # ToDo List
