@@ -1,8 +1,9 @@
 from django.contrib.auth import authenticate, login
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
-from .models import Category
-from .serializers import CategorySerializer
+from .models import Category , ToDo
+from django.contrib.auth.models import User
+from .serializers import CategorySerializer , ToDoSerializer , CreateToDoSerializer
 class AuthUtils:
 
     def login(request):
@@ -33,4 +34,20 @@ class CategoryUtils:
         serializer = CategorySerializer(categories, many=True)
         return serializer
         
-        
+
+class ToDoUtils:
+    
+    def get_todos(user:User,categories: list[int|None]):
+        query = ToDo.objects.filter(user=user)
+        if categories:
+            query = query.filter(categories__in=categories)
+        todos = query.all()
+        serializer = ToDoSerializer(todos, many=True)
+        return serializer
+    
+    def create_todo(todo_data, user):
+        serializer = CreateToDoSerializer(data=todo_data)
+        if serializer.is_valid():
+            serializer.save(user=user)
+            return serializer
+        raise Exception(serializer.error_messages)

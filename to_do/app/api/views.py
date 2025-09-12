@@ -9,12 +9,13 @@ from app.models import ToDo, Category
 from rest_framework.views import APIView
 from rest_framework import permissions, decorators, viewsets, status
 from rest_framework.response import Response
-from rest_framework.exceptions import NotAuthenticated
-from app.utils import AuthUtils , CategoryUtils
+from rest_framework.exceptions import APIException, NotAuthenticated
+from app.utils import AuthUtils, CategoryUtils, ToDoUtils
 from drf_yasg.utils import swagger_auto_schema
 from .swagger_schemas import AuthSchema, CategorySchema, ToDoSchema
 from django.views.decorators.cache import cache_page
 from django.http import Http404
+
 # Authentication
 
 
@@ -53,8 +54,8 @@ class CategoryList(APIView):
         try:
             serializer = CategoryUtils.get_categories()
             return Response(serializer.data)
-        except NotAuthenticated as e :
-            raise Response(e.detail,status=status.HTTP_403_FORBIDDEN)
+        except NotAuthenticated as e:
+            raise Response(e.detail, status=status.HTTP_403_FORBIDDEN)
 
 
 # ToDo List
@@ -64,21 +65,20 @@ class ToDoList(APIView):
     @swagger_auto_schema(**ToDoSchema.todo_list_schema())
     @method_decorator(cache_page(60 * 15, key_prefix="todo_list"))
     def get(self, request, format=None):
-        query = ToDo.objects.filter(user=request.user)
-        if "categories" in request.query_params:
+        try:
             categories = request.query_params.getlist("categories", [])
-            query = query.filter(categories__in=categories)
-        todos = query.all()
-        serializer = ToDoSerializer(todos, many=True)
-        return Response(serializer.data)
+            serializer = ToDoUtils.get_todos(request.user, categories)
+            return Response(serializer.data)
+        except APIException as e:
+            raise Response(e.detail, status=e.status_code)
 
     @swagger_auto_schema(**ToDoSchema.create_todo_schema())
     def post(self, request, format=None):
-        serializer = CreateToDoSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
+        try:
+            serializer = ToDoUtils.create_todo(request.data, request.user)
             return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+        except APIException as e:
+            raise Response(e.detail, status=e.status_code)
 
 
 class ToDoDetails(APIView):
@@ -93,14 +93,14 @@ class ToDoDetails(APIView):
     @swagger_auto_schema(**ToDoSchema.todo_details_schema())
     def get(self, request, pk, format=None):
         print(request.user)
-        to_do = self.get_object(user=request.user, pk=pk)
-        serializer = ToDoSerializer(to_do)
+        todo = self.get_object(user=request.user, pk=pk)
+        serializer = ToDoSerializer(todo)
         return Response(serializer.data)
 
     @swagger_auto_schema(**ToDoSchema.update_todo_schema())
     def put(self, request, pk, format=None):
-        to_do = self.get_object(user=request.user, pk=pk)
-        serializer = CreateToDoSerializer(to_do, data=request.data)
+        todo = self.get_object(user=request.user, pk=pk)
+        serializer = CreateToDoSerializer(todo, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -108,6 +108,6 @@ class ToDoDetails(APIView):
 
     @swagger_auto_schema(**ToDoSchema.delete_todo_schema())
     def delete(self, request, pk, format=None):
-        to_do = self.get_object(user=request.user, pk=pk)
-        to_do.delete()
+        todo = self.get_object(user=request.user, pk=pk)
+        todo.delete()
         return Response(status=204)
