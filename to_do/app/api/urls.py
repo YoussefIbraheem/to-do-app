@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import permissions
-from app.api.views import login , register , ToDoList , CategoryList , ToDoDetails
+from app.api.views import AuthView , ToDoList , CategoryList , ToDoDetails
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
@@ -28,8 +28,8 @@ urlpatterns = [
         name="schema-swagger-ui",
     ),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
-    path("login/", login, name="login"),
-    path("register/", register, name="register"),
+    path("login/", AuthView.login, name="login"),
+    path("register/", AuthView.register, name="register"),
     path("categories/", CategoryList.as_view(), name="category-list"),
     path("todos/", ToDoList.as_view(), name="todo-list"),
     path("todos/<int:pk>", ToDoDetails.as_view(), name="todo-details")

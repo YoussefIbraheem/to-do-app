@@ -17,26 +17,27 @@ from django.http import Http404
 # Authentication
 
 
-@swagger_auto_schema(**AuthSchema.login_schema())
-@decorators.api_view(["POST"])
-@decorators.permission_classes([permissions.AllowAny])
-def login(request):
-    user, token = AuthUtils.login(request)
-    if user is not None:
-        return Response({"user": UserSerializer(user).data, "token": token.key})
-    else:
-        return Response({"error": "Invalid Credentials"}, status=400)
-
-
-@swagger_auto_schema(**AuthSchema.register_schema())
-@decorators.api_view(["POST"])
-@decorators.permission_classes([permissions.AllowAny])
-def register(request):
-    user, token = AuthUtils.register(request)
-    if user is not None:
-        return Response({"user": UserSerializer(user).data, "token": token.key})
-    else:
-        return Response({"error": "Username already exists"}, status=400)
+class AuthView:
+    @swagger_auto_schema(**AuthSchema.login_schema())
+    @decorators.api_view(["POST"])
+    @decorators.permission_classes([permissions.AllowAny])
+    def login(request):
+        user, token = AuthUtils.login(request)
+        if user is not None:
+            return Response({"user": UserSerializer(user).data, "token": token.key})
+        else:
+            return Response({"error": "Invalid Credentials"}, status=400)
+    
+    
+    @swagger_auto_schema(**AuthSchema.register_schema())
+    @decorators.api_view(["POST"])
+    @decorators.permission_classes([permissions.AllowAny])
+    def register(request):
+        user, token = AuthUtils.register(request)
+        if user is not None:
+            return Response({"user": UserSerializer(user).data, "token": token.key})
+        else:
+            return Response({"error": "Username already exists"}, status=400)
 
 
 # Category List View

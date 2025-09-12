@@ -78,31 +78,6 @@ class ToDoTests(APITestCase):
         )
         self.todo.categories.add(self.category)
 
-    # # ------- Integration-style tests using APIClient + reverse() -------
-    # def test_get_todos_list_integration(self):
-    #     url = reverse("todo-list")
-    #     response = self.client.get(url)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(len(response.data), 1)
-
-    # def test_create_todo_integration(self):
-    #     url = reverse("todo-list")
-    #     data = {
-    #         "title": "New ToDo",
-    #         "description": "Test desc",
-    #         "categories": [self.category.id],
-    #     }
-    #     response = self.client.post(url, data, format="json")
-    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-    #     self.assertEqual(response.data["title"], "New ToDo")
-
-    # # If reverse with args is giving trouble, try kwargs:
-    # def test_reverse_with_kwargs_example(self):
-    #     # reverse using kwargs instead of args
-    #     url = reverse("to-do-details", kwargs={"pk": self.todo.id})
-    #     response = self.client.get(url)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-
     # ------- View-level tests using APIRequestFactory (explicit pk) -------
     def test_get_todo_details_via_factory(self):
         """
