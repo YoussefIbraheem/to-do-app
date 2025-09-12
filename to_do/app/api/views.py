@@ -77,7 +77,7 @@ class ToDoList(APIView):
 
     @swagger_auto_schema(**ToDoSchema.update_todo_schema())
     def put(self, request, pk, format=None):
-        to_do = self.get_object(pk)
+        to_do = ToDo.get_object(pk)
         serializer = CreateToDoSerializer(to_do, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -86,7 +86,7 @@ class ToDoList(APIView):
 
     @swagger_auto_schema(**ToDoSchema.delete_todo_schema())
     def delete(self, request, pk, format=None):
-        to_do = self.get_object(pk)
+        to_do = ToDo.get_object(pk)
         to_do.delete()
         return Response(status=204)
 
@@ -94,13 +94,8 @@ class ToDoList(APIView):
 class ToDoDetails(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_object(self, request, pk):
-        try:
-            return ToDo.objects.filter(user=request.user).get(pk=pk)
-        except ToDo.DoesNotExist as e:
-            raise Exception("ToDo not found") from e
     @swagger_auto_schema(**ToDoSchema.todo_details_schema())
     def get(self, request, pk, format=None):
-        to_do = self.get_object(request, pk)
+        to_do = ToDo.get_object(request, pk)
         serializer = ToDoSerializer(to_do)
         return Response(serializer.data)

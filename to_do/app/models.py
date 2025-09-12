@@ -28,3 +28,8 @@ class ToDo(models.Model):
     def __str__(self):
         return self.title
     
+    def get_object(self, request, pk):
+        try:
+            return ToDo.objects.filter(user=request.user).get(pk=pk)
+        except ToDo.DoesNotExist as e:
+            raise Exception("ToDo not found") from e
